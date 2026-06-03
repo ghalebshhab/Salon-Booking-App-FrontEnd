@@ -15,6 +15,9 @@ import CreateSalon from "../pages/owner/CreateSalon";
 import CreateHiringPost from "../pages/owner/CreateHiringPost";
 import CreateMediaPost from "../pages/owner/CreateMediaPost";
 import MySalon from "../pages/owner/MySalon";
+import MySalonServices from "../pages/owner/MySalonServices";
+import CreateSalonService from "../pages/owner/AddSalonService";
+import EditSalonService from "../pages/owner/EditSalonService";
 
 function AppRoutes() {
   return (
@@ -28,6 +31,7 @@ function AppRoutes() {
           <Route path="/hiring-posts" element={<HiringPosts />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+        
 
           <Route
             path="/owner/dashboard"
@@ -73,6 +77,32 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/owner/services"
+  element={
+    <ProtectedRoute>
+      <MySalonServices />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/owner/create-service"
+  element={
+    <ProtectedRoute>
+      <CreateSalonService />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/owner/services/:serviceId/edit"
+  element={
+    <ProtectedRoute>
+      <EditSalonService />
+    </ProtectedRoute>
+  }
+/>
         </Routes>
       </main>
 

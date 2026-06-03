@@ -8,7 +8,7 @@ import { getSalonMediaApi } from "../../api/mediaApi";
 import SalonEmployees from "../../components/salons/SalonEmployees";
 import SalonMediaGrid from "../../components/media/SalonMediaGrid";
 import SalonStatusBadge from "../../components/salons/SalonStatusBadge";
-
+import SalonServicesList from "../../components/services/SalonServicesList";
 function SalonDetails() {
   const { salonId } = useParams();
 
@@ -171,6 +171,12 @@ function SalonDetails() {
           </p>
         </div>
       </div>
+      <div className="section-title left">
+  <h2>Services</h2>
+  <p>Choose a service from this salon. Booking will be available soon.</p>
+</div>
+
+<SalonServicesList salonId={salonId} />
 
       {images.length > 1 && (
         <>

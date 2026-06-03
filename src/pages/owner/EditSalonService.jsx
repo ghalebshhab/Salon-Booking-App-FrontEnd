@@ -1,10 +1,15 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
-import { createSalonServiceApi } from "../../api/SalonServicesApi";
+import {
+  getMySalonServicesApi,
+  updateSalonServiceApi,
+} from "../../api/SalonServicesApi";
 
-function CreateSalonService() {
+function EditSalonService() {
+  const { serviceId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -12,16 +17,70 @@ function CreateSalonService() {
     description: "",
     price: "",
     durationMinutes: "",
+    isActive: true,
   });
 
+  const [loading, setLoading] = useState(!location.state?.service);
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    const serviceFromState = location.state?.service;
+
+    if (serviceFromState) {
+      setFormData({
+        name: serviceFromState.name || "",
+        description: serviceFromState.description || "",
+        price: serviceFromState.price || "",
+        durationMinutes: serviceFromState.durationMinutes || "",
+        isActive: serviceFromState.isActive ?? true,
+      });
+      return;
+    }
+
+    const loadService = async () => {
+      try {
+        setLoading(true);
+
+        const response = await getMySalonServicesApi();
+
+        if (response.success) {
+          const service = response.data?.find(
+            (item) => String(item.id) === String(serviceId)
+          );
+
+          if (!service) {
+            toast.error("Service not found");
+            navigate("/owner/services");
+            return;
+          }
+
+          setFormData({
+            name: service.name || "",
+            description: service.description || "",
+            price: service.price || "",
+            durationMinutes: service.durationMinutes || "",
+            isActive: service.isActive ?? true,
+          });
+        } else {
+          toast.error(response.message || "Failed to load service");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load service");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadService();
+  }, [serviceId, location.state, navigate]);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -54,34 +113,39 @@ function CreateSalonService() {
       description: formData.description.trim(),
       price: Number(formData.price),
       durationMinutes: Number(formData.durationMinutes),
+      isActive: formData.isActive,
     };
 
     try {
       setSubmitting(true);
 
-      const response = await createSalonServiceApi(requestBody);
+      const response = await updateSalonServiceApi(serviceId, requestBody);
 
       if (response.success) {
-        toast.success("Service created successfully");
+        toast.success("Service updated successfully");
         navigate("/owner/services");
       } else {
-        toast.error(response.message || "Failed to create service");
+        toast.error(response.message || "Failed to update service");
       }
     } catch (error) {
       console.error(error);
-      toast.error(error?.response?.data?.message || "Failed to create service");
+      toast.error(error?.response?.data?.message || "Failed to update service");
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (loading) {
+    return <div className="loading">Loading service...</div>;
+  }
+
   return (
     <section className="container section">
       <div className="profile-header">
         <div>
-          <span className="eyebrow">New service</span>
-          <h1>Add Salon Service</h1>
-          <p>Create a service that customers can see in your salon profile.</p>
+          <span className="eyebrow">Edit service</span>
+          <h1>Update Salon Service</h1>
+          <p>Edit service information shown in your salon profile.</p>
         </div>
 
         <Link className="btn btn-secondary" to="/owner/services">
@@ -139,12 +203,22 @@ function CreateSalonService() {
           </div>
         </div>
 
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
+            name="isActive"
+            checked={formData.isActive}
+            onChange={handleChange}
+          />
+          Active service
+        </label>
+
         <button className="btn btn-primary" type="submit" disabled={submitting}>
-          {submitting ? "Creating..." : "Create Service"}
+          {submitting ? "Saving..." : "Save Changes"}
         </button>
       </form>
     </section>
   );
 }
 
-export default CreateSalonService;
+export default EditSalonService;

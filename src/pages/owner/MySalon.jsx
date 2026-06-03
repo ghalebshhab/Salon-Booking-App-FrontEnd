@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Edit, Trash2, Users, Image } from "lucide-react";
+import { Edit, Trash2, Users, Image, Scissors } from "lucide-react";
 
 import { getMySalonApi, getSalonEmployeesApi } from "../../api/salonApi";
 import { getSalonMediaApi } from "../../api/mediaApi";
@@ -146,6 +146,12 @@ function MySalon() {
           <h3>Post Media</h3>
           <p>Share images and videos of your work.</p>
         </Link>
+
+        <Link className="dashboard-card" to="/owner/services">
+  <Scissors size={24} />
+  <h3>Manage Services</h3>
+  <p>Add, update, and disable services for your salon.</p>
+</Link>
       </div>
 
       {/* Salon info grid */}

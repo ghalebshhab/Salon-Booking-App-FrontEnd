@@ -32,3 +32,7 @@ export const getSalonEmployeesApi = async (salonId) => {
   const response = await axiosInstance.get(`/salons/${salonId}/employees`);
   return response.data;
 };
+export const getAllSalonsApi = async () => {
+  const response = await axiosInstance.get("/salons");
+  return response.data;
+};

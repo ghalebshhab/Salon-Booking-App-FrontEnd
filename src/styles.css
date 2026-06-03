@@ -799,6 +799,142 @@ select {
     radial-gradient(circle at top right, rgba(192, 132, 151, 0.22), transparent 35%),
     linear-gradient(135deg, #fff9f5, #f7e7ce);
 }
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.service-card {
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.service-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  color: #222;
+}
+
+.service-card p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+.service-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.service-meta span {
+  background: #f5f5f5;
+  color: #333;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.active-tag {
+  background: #e7f8ee !important;
+  color: #168a45 !important;
+}
+
+.inactive-tag {
+  background: #fdecec !important;
+  color: #c0392b !important;
+}
+
+.service-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.form-card {
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 18px;
+  padding: 1.5rem;
+  max-width: 760px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  background: #ffffff;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #222;
+}
+
+.form-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1rem 0;
+  font-weight: 600;
+}
+
+.btn-danger {
+  background: #d93636;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: #b92d2d;
+}
+
+@media (max-width: 700px) {
+  .form-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .service-actions {
+    flex-direction: column;
+  }
+
+  .service-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
 
 .hero-grid {
   display: grid;
@@ -1285,5 +1421,110 @@ select {
   .auth-card,
   .form-card {
     padding: 24px;
+  }
+}
+.salon-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.salon-showcase-card {
+  text-decoration: none;
+  color: inherit;
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid #eeeeee;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.salon-showcase-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+.salon-showcase-image {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f6f1ee, #efe5df);
+}
+
+.salon-showcase-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.salon-showcase-card:hover .salon-showcase-image img {
+  transform: scale(1.05);
+  transition: transform 0.35s ease;
+}
+
+.salon-showcase-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 4rem;
+  font-weight: 800;
+  color: #8a5a44;
+}
+
+.salon-state-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.salon-state-badge.open {
+  background: #16a34a;
+}
+
+.salon-state-badge.closed {
+  background: #dc2626;
+}
+
+.salon-showcase-body {
+  padding: 1.2rem;
+}
+
+.salon-showcase-body h3 {
+  margin: 0 0 0.7rem;
+  font-size: 1.25rem;
+}
+
+.salon-location,
+.salon-time {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #666;
+  margin: 0.45rem 0;
+  font-size: 0.95rem;
+}
+
+.salon-showcase-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eeeeee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #8a5a44;
+  font-weight: 800;
+}
+
+@media (max-width: 700px) {
+  .salon-showcase-image {
+    height: 190px;
   }
 }

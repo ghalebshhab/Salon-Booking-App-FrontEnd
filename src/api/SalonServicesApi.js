@@ -1,26 +1,29 @@
-import api from "./api";
+import axiosInstance from "./axiosInstance";
 
-export const createSalonService = async (serviceData) => {
-  const response = await api.post("/salon-services", serviceData);
+export const createSalonServiceApi = async (serviceData) => {
+  const response = await axiosInstance.post("/salon-services", serviceData);
   return response.data;
 };
 
-export const getSalonServices = async (salonId) => {
-  const response = await api.get(`/salon-services/salon/${salonId}`);
+export const getActiveSalonServicesApi = async (salonId) => {
+  const response = await axiosInstance.get(`/salon-services/salon/${salonId}`);
   return response.data;
 };
 
-export const getMySalonServices = async () => {
-  const response = await api.get("/salon-services/my-salon");
+export const getMySalonServicesApi = async () => {
+  const response = await axiosInstance.get("/salon-services/my-salon");
   return response.data;
 };
 
-export const updateSalonService = async (serviceId, serviceData) => {
-  const response = await api.put(`/salon-services/${serviceId}`, serviceData);
+export const updateSalonServiceApi = async (serviceId, serviceData) => {
+  const response = await axiosInstance.put(
+    `/salon-services/${serviceId}`,
+    serviceData,
+  );
   return response.data;
 };
 
-export const deleteSalonService = async (serviceId) => {
-  const response = await api.delete(`/salon-services/${serviceId}`);
+export const deleteSalonServiceApi = async (serviceId) => {
+  const response = await axiosInstance.delete(`/salon-services/${serviceId}`);
   return response.data;
 };

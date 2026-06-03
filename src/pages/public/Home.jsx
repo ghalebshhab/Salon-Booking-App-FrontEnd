@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Scissors, Users, CalendarCheck, Image } from "lucide-react";
 import BarberAnimation from "../../components/common/BarberAnimation";
+import SalonShowcase from "../../components/salons/SalonShowcase";
 function Home() {
   return (
     <div>
@@ -29,6 +30,17 @@ function Home() {
 </div>
         </div>
       </section>
+      <section className="container section">
+  <div className="section-title">
+    <span className="eyebrow">Explore salons</span>
+    <h2>Discover salon work</h2>
+    <p>
+      Browse salons, view their photos, check their services, and open their profile.
+    </p>
+  </div>
+
+  <SalonShowcase />
+</section>
 
       <section className="container section">
         <div className="section-title">
