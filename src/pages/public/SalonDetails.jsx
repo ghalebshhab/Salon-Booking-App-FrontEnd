@@ -6,6 +6,7 @@ import {
   showInfoToast,
   showWarningToast,
 } from "../../utils/appToast";
+import ReviewsList from "../../components/reviews/ReviewsList";
 
 import { getSalonByIdApi, getSalonEmployeesApi } from "../../api/salonApi";
 import { getSalonMediaApi } from "../../api/mediaApi";
@@ -182,6 +183,13 @@ function SalonDetails() {
 </div>
 
 <SalonServicesList salonId={salonId} />
+
+<div className="section-title left">
+  <h2>Customer Reviews</h2>
+  <p>See what customers say after completing their appointments.</p>
+</div>
+
+<ReviewsList salonId={salonId} />
 
       {images.length > 1 && (
         <>

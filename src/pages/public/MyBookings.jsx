@@ -5,6 +5,8 @@ import {
   showInfoToast,
   showWarningToast,
 } from "../../utils/appToast";
+import { MessageSquareText } from "lucide-react";
+import CreateReviewModal from "../../components/reviews/CreateReviewModal";
 import { CalendarDays, Clock, MapPin, Phone, XCircle } from "lucide-react";
 
 import { cancelMyBookingApi, getMyBookingsApi } from "../../api/bookingApi";
@@ -57,6 +59,21 @@ function MyBookings() {
       showErrorToast("Failed to cancel booking");
     }
   };
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+const [selectedReviewBooking, setSelectedReviewBooking] = useState(null);
+const openReviewModal = (booking) => {
+  setSelectedReviewBooking(booking);
+  setReviewModalOpen(true);
+};
+
+const closeReviewModal = () => {
+  setSelectedReviewBooking(null);
+  setReviewModalOpen(false);
+};
+
+const handleReviewCreated = () => {
+  loadBookings();
+};
 
   const getStatusClass = (status) => {
     if (status === "ACCEPTED") return "active-tag";
@@ -171,10 +188,27 @@ function MyBookings() {
                   Cancel Booking
                 </button>
               )}
+
+              {booking.status === "COMPLETED" && (
+  <button
+    className="btn btn-primary btn-small"
+    onClick={() => openReviewModal(booking)}
+  >
+    <MessageSquareText size={16} />
+    Write Review
+  </button>
+)}
             </div>
           ))}
         </div>
       )}
+      {reviewModalOpen && (
+  <CreateReviewModal
+    booking={selectedReviewBooking}
+    onClose={closeReviewModal}
+    onReviewCreated={handleReviewCreated}
+  />
+)}
     </section>
   );
 }
