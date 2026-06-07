@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { Edit, Trash2, Users, Image, Scissors } from "lucide-react";
 
 import { getMySalonApi, getSalonEmployeesApi } from "../../api/salonApi";

@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { loginApi } from "../../api/authApi";
 import { saveToken, saveUser } from "../../utils/tokenStorage";
 
@@ -29,17 +34,17 @@ function Login() {
       const response = await loginApi(form);
 
       if (!response.success) {
-        toast.error(response.message || "Login failed");
+        showErrorToast(response.message || "Login failed");
         return;
       }
 
       saveToken(response.data.token);
       saveUser(response.data);
 
-      toast.success("Login successfully");
+     showSuccessToast("Welcome back to SalonHub ✨", "Logged in");
       navigate("/owner/dashboard");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Login failed");
+      showErrorToast(error?.response?.data?.message || "Login failed");
       console.error(error);
     } finally {
       setLoading(false);

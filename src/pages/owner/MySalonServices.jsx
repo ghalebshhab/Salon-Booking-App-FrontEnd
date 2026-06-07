@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { Edit, Trash2, Plus } from "lucide-react";
 
 import {
@@ -21,11 +26,11 @@ function MySalonServices() {
       if (response.success) {
         setServices(response.data || []);
       } else {
-        toast.error(response.message || "Failed to load services");
+        showErrorToast(response.message || "Failed to load services");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load your salon services");
+      showErrorToast("Failed to load your salon services");
     } finally {
       setLoading(false);
     }
@@ -46,14 +51,14 @@ function MySalonServices() {
       const response = await deleteSalonServiceApi(serviceId);
 
       if (response.success) {
-        toast.success("Service disabled successfully");
+        showSuccessToast("Service disabled successfully");
         loadServices();
       } else {
-        toast.error(response.message || "Failed to disable service");
+        showErrorToast(response.message || "Failed to disable service");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to disable service");
+      showErrorToast("Failed to disable service");
     }
   };
 

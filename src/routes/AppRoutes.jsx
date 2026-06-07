@@ -19,6 +19,9 @@ import MySalonServices from "../pages/owner/MySalonServices";
 import CreateSalonService from "../pages/owner/AddSalonService";
 import EditSalonService from "../pages/owner/EditSalonService";
 
+import CreateBooking from "../pages/public/CreateBooking";
+import MyBookings from "../pages/public/MyBookings";
+import SalonBookings from "../pages/owner/SalonBookings";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -31,6 +34,33 @@ function AppRoutes() {
           <Route path="/hiring-posts" element={<HiringPosts />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          <Route
+  path="/salons/:salonId/book"
+  element={
+    <ProtectedRoute>
+      <CreateBooking />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/my-bookings"
+  element={
+    <ProtectedRoute>
+      <MyBookings />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/owner/bookings"
+  element={
+    <ProtectedRoute>
+      <SalonBookings />
+    </ProtectedRoute>
+  }
+/>
         
 
           <Route

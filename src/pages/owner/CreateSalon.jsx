@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { createSalonApi } from "../../api/salonApi";
 
 function CreateSalon() {
@@ -54,14 +59,14 @@ function CreateSalon() {
       const response = await createSalonApi(buildPayload());
 
       if (!response.success) {
-        toast.error(response.message || "Failed to create salon");
+        showErrorToast(response.message || "Failed to create salon");
         return;
       }
 
-      toast.success("Salon created successfully!");
+      showSuccessToast("Salon created successfully!");
       navigate("/owner/my-salon");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to create salon");
+      showErrorToast(error?.response?.data?.message || "Failed to create salon");
       console.error(error);
     } finally {
       setLoading(false);

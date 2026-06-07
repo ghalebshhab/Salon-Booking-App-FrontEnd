@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Clock, ArrowRight } from "lucide-react";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 
 import { getAllSalonsApi } from "../../api/salonApi";
 
@@ -27,11 +32,11 @@ function SalonShowcase() {
       if (response.success) {
         setSalons(response.data || []);
       } else {
-        toast.error(response.message || "Failed to load salons");
+        showErrorToast(response.message || "Failed to load salons");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load salons");
+      showErrorToast("Failed to load salons");
     } finally {
       setLoading(false);
     }

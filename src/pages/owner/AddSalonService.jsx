@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 
 import { createSalonServiceApi } from "../../api/SalonServicesApi";
 
@@ -27,17 +32,17 @@ function CreateSalonService() {
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      toast.error("Service name is required");
+      showErrorToast("Service name is required");
       return false;
     }
 
     if (Number(formData.price) <= 0) {
-      toast.error("Price must be greater than 0");
+      showErrorToast("Price must be greater than 0");
       return false;
     }
 
     if (Number(formData.durationMinutes) <= 0) {
-      toast.error("Duration must be greater than 0");
+      showErrorToast("Duration must be greater than 0");
       return false;
     }
 
@@ -62,14 +67,14 @@ function CreateSalonService() {
       const response = await createSalonServiceApi(requestBody);
 
       if (response.success) {
-        toast.success("Service created successfully");
+        showSuccessToast("Service created successfully");
         navigate("/owner/services");
       } else {
-        toast.error(response.message || "Failed to create service");
+        showErrorToast(response.message || "Failed to create service");
       }
     } catch (error) {
       console.error(error);
-      toast.error(error?.response?.data?.message || "Failed to create service");
+      showErrorToast(error?.response?.data?.message || "Failed to create service");
     } finally {
       setSubmitting(false);
     }

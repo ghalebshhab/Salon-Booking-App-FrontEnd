@@ -1,4 +1,9 @@
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { joinHiringPostApi } from "../../api/hiringApi";
 import { isLoggedIn } from "../../utils/tokenStorage";
 import { formatDateTime } from "../../utils/formatTime";

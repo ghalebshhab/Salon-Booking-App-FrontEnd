@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
+import { CalendarDays } from "lucide-react";
+
 import { getActiveSalonServicesApi } from "../../api/SalonServicesApi";
 
 function SalonServicesList({ salonId }) {
+  const navigate = useNavigate();
+
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -15,11 +25,11 @@ function SalonServicesList({ salonId }) {
       if (response.success) {
         setServices(response.data || []);
       } else {
-        toast.error(response.message || "Failed to load services");
+        showErrorToast(response.message || "Failed to load services");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load salon services");
+      showErrorToast("Failed to load salon services");
     } finally {
       setLoading(false);
     }
@@ -30,6 +40,14 @@ function SalonServicesList({ salonId }) {
       loadServices();
     }
   }, [salonId]);
+
+  const handleBookNow = (service) => {
+    navigate(`/salons/${salonId}/book`, {
+      state: {
+        selectedServiceId: service.id,
+      },
+    });
+  };
 
   if (loading) {
     return <div className="loading">Loading services...</div>;
@@ -58,8 +76,12 @@ function SalonServicesList({ salonId }) {
             <span>{service.durationMinutes} min</span>
           </div>
 
-          <button className="btn btn-primary btn-small" disabled>
-            Book Soon
+          <button
+            className="btn btn-primary btn-small"
+            onClick={() => handleBookNow(service)}
+          >
+            <CalendarDays size={16} />
+            Book Now
           </button>
         </div>
       ))}

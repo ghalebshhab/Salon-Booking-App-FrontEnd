@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 
 import { getSalonByIdApi, getSalonEmployeesApi } from "../../api/salonApi";
 import { getSalonMediaApi } from "../../api/mediaApi";
@@ -34,7 +39,7 @@ function SalonDetails() {
       const salonResponse = await getSalonByIdApi(salonId);
 
       if (!salonResponse.success) {
-        toast.error(salonResponse.message || "Salon not found");
+        showErrorToast(salonResponse.message || "Salon not found");
         return;
       }
 
@@ -60,7 +65,7 @@ function SalonDetails() {
         console.warn("Media endpoint error:", error);
       }
     } catch (error) {
-      toast.error("Failed to load salon profile");
+      showErrorToast("Failed to load salon profile");
       console.error(error);
     } finally {
       setLoading(false);

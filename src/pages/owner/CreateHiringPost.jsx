@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { createHiringPostApi } from "../../api/hiringApi";
 
 function CreateHiringPost() {
@@ -30,14 +35,14 @@ function CreateHiringPost() {
       });
 
       if (!response.success) {
-        toast.error(response.message || "Failed to create hiring post");
+        showErrorToast(response.message || "Failed to create hiring post");
         return;
       }
 
-      toast.success("Hiring post created successfully");
+      showSuccessToast("Hiring post created successfully");
       setForm({ title: "", description: "", numOfEmps: 1 });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to create hiring post");
+      showErrorToast(error?.response?.data?.message || "Failed to create hiring post");
       console.error(error);
     } finally {
       setLoading(false);

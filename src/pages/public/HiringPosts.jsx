@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { getOpenHiringPostsApi } from "../../api/hiringApi";
 import HiringPostCard from "../../components/hiring/HiringPostCard";
 import Loading from "../../components/common/Loading";
@@ -15,13 +20,13 @@ function HiringPosts() {
       const response = await getOpenHiringPostsApi();
 
       if (!response.success) {
-        toast.error(response.message || "Failed to load hiring posts");
+        showErrorToast(response.message || "Failed to load hiring posts");
         return;
       }
 
       setPosts(response.data || []);
     } catch (error) {
-      toast.error("Failed to load hiring posts");
+      showErrorToast("Failed to load hiring posts");
       console.error(error);
     } finally {
       setLoading(false);

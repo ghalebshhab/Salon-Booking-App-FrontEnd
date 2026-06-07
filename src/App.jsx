@@ -5,7 +5,20 @@ function App() {
   return (
     <>
       <AppRoutes />
-      <ToastContainer position="top-right" />
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3600}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        limit={4}
+        theme="dark"
+        toastClassName="salon-toast-shell"
+        bodyClassName="salon-toast-body"
+      />
     </>
   );
 }

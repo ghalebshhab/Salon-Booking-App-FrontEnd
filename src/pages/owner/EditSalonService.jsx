@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams, Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 
 import {
   getMySalonServicesApi,
@@ -49,7 +54,7 @@ function EditSalonService() {
           );
 
           if (!service) {
-            toast.error("Service not found");
+            showErrorToast("Service not found");
             navigate("/owner/services");
             return;
           }
@@ -62,11 +67,11 @@ function EditSalonService() {
             isActive: service.isActive ?? true,
           });
         } else {
-          toast.error(response.message || "Failed to load service");
+          showErrorToast(response.message || "Failed to load service");
         }
       } catch (error) {
         console.error(error);
-        toast.error("Failed to load service");
+        showErrorToast("Failed to load service");
       } finally {
         setLoading(false);
       }
@@ -86,17 +91,17 @@ function EditSalonService() {
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      toast.error("Service name is required");
+      showErrorToast("Service name is required");
       return false;
     }
 
     if (Number(formData.price) <= 0) {
-      toast.error("Price must be greater than 0");
+      showErrorToast("Price must be greater than 0");
       return false;
     }
 
     if (Number(formData.durationMinutes) <= 0) {
-      toast.error("Duration must be greater than 0");
+      showErrorToast("Duration must be greater than 0");
       return false;
     }
 
@@ -122,14 +127,14 @@ function EditSalonService() {
       const response = await updateSalonServiceApi(serviceId, requestBody);
 
       if (response.success) {
-        toast.success("Service updated successfully");
+        showSuccessToast("Service updated successfully");
         navigate("/owner/services");
       } else {
-        toast.error(response.message || "Failed to update service");
+        showErrorToast(response.message || "Failed to update service");
       }
     } catch (error) {
       console.error(error);
-      toast.error(error?.response?.data?.message || "Failed to update service");
+      showErrorToast(error?.response?.data?.message || "Failed to update service");
     } finally {
       setSubmitting(false);
     }

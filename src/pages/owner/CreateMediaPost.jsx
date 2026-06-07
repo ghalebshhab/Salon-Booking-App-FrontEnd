@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { createMediaPostApi } from "../../api/mediaApi";
 
 function CreateMediaPost() {
@@ -26,14 +31,14 @@ function CreateMediaPost() {
       const response = await createMediaPostApi(form);
 
       if (!response.success) {
-        toast.error(response.message || "Failed to create media post");
+        showErrorToast(response.message || "Failed to create media post");
         return;
       }
 
-      toast.success("Media posted successfully");
+      showSuccessToast  ("Media posted successfully");
       setForm({ caption: "", mediaUrl: "", mediaType: "IMAGE" });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to create media post");
+      showErrorToast(error?.response?.data?.message || "Failed to create media post");
       console.error(error);
     } finally {
       setLoading(false);

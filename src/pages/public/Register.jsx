@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import {
+  showSuccessToast,
+  showErrorToast,
+  showInfoToast,
+  showWarningToast,
+} from "../../utils/appToast";
 import { registerApi } from "../../api/authApi";
 
 function Register() {
@@ -32,14 +37,14 @@ function Register() {
       const response = await registerApi(form);
 
       if (!response.success) {
-        toast.error(response.message || "Register failed");
+        showErrorToast(response.message || "Register failed");
         return;
       }
 
-      toast.success("Registered successfully. Please login.");
+      showSuccessToast("Registered successfully. Please login.");
       navigate("/login");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Register failed");
+      showErrorToast(error?.response?.data?.message || "Register failed");
       console.error(error);
     } finally {
       setLoading(false);
