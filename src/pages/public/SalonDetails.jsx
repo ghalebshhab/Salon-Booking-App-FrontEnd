@@ -7,11 +7,10 @@ import {
   showWarningToast,
 } from "../../utils/appToast";
 import ReviewsList from "../../components/reviews/ReviewsList";
-
-import { getSalonByIdApi, getSalonEmployeesApi } from "../../api/salonApi";
+import SalonTeamOrbit from "../../components/salons/SalonTeamOrbit";
+import { getSalonByIdApi } from "../../api/salonApi";
+import { getSalonEmployeesApi } from "../../api/SalonEmployeesApi";
 import { getSalonMediaApi } from "../../api/mediaApi";
-
-import SalonEmployees from "../../components/salons/SalonEmployees";
 import SalonMediaGrid from "../../components/media/SalonMediaGrid";
 import SalonStatusBadge from "../../components/salons/SalonStatusBadge";
 import SalonServicesList from "../../components/services/SalonServicesList";
@@ -215,7 +214,7 @@ function SalonDetails() {
         <p>The owner details are above. Active employees are listed below.</p>
       </div>
 
-      <SalonEmployees employees={employees} />
+     <SalonTeamOrbit salon={salon} employees={employees} />
 
       <div className="section-title left">
         <h2>Salon Work</h2>

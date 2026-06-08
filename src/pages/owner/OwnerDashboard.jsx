@@ -8,7 +8,7 @@ import {
   CalendarCheck,
   Scissors,
 } from "lucide-react";
-
+import { UsersRound } from "lucide-react";
 function OwnerDashboard() {
   return (
     <section className="container section">
@@ -62,6 +62,11 @@ function OwnerDashboard() {
           <h3>View Hiring Posts</h3>
           <p>See all open hiring posts on the platform.</p>
         </Link>
+        <Link className="dashboard-card" to="/owner/employees">
+  <UsersRound />
+  <h3>Employees</h3>
+  <p>View invited and active employees in your salon.</p>
+</Link>
       </div>
     </section>
   );

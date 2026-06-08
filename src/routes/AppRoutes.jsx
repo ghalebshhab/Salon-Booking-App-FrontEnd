@@ -22,6 +22,8 @@ import EditSalonService from "../pages/owner/EditSalonService";
 import CreateBooking from "../pages/public/CreateBooking";
 import MyBookings from "../pages/public/MyBookings";
 import SalonBookings from "../pages/owner/SalonBookings";
+import MySalonEmployees from "../pages/owner/MySalonEmployees";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -130,6 +132,14 @@ function AppRoutes() {
   element={
     <ProtectedRoute>
       <EditSalonService />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/owner/employees"
+  element={
+    <ProtectedRoute>
+      <MySalonEmployees />
     </ProtectedRoute>
   }
 />
