@@ -3,7 +3,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   showSuccessToast,
   showErrorToast,
-  showInfoToast,
   showWarningToast,
 } from "../../utils/appToast";
 import {
@@ -13,10 +12,12 @@ import {
   Phone,
   Scissors,
   StickyNote,
+  UserRound,
 } from "lucide-react";
 
 import { getSalonByIdApi } from "../../api/salonApi";
 import { getActiveSalonServicesApi } from "../../api/SalonServicesApi";
+import { getSalonEmployeesApi } from "../../api/SalonEmployeesApi";
 import { createBookingApi } from "../../api/bookingApi";
 
 function CreateBooking() {
@@ -28,8 +29,10 @@ function CreateBooking() {
 
   const [salon, setSalon] = useState(null);
   const [services, setServices] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
   const [selectedServiceIds, setSelectedServiceIds] = useState([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [customerPhoneNumber, setCustomerPhoneNumber] = useState("");
   const [customerLocation, setCustomerLocation] = useState("");
   const [bookingDate, setBookingDate] = useState("");
@@ -63,6 +66,20 @@ function CreateBooking() {
         }
       } else {
         showErrorToast(servicesResponse.message || "Failed to load services");
+      }
+
+      try {
+        const employeesResponse = await getSalonEmployeesApi(salonId);
+
+        if (employeesResponse.success) {
+          const activeEmployees = (employeesResponse.data || []).filter(
+            (employee) => employee.status === "ACTIVE"
+          );
+
+          setEmployees(activeEmployees);
+        }
+      } catch (error) {
+        console.warn("Employees could not be loaded", error);
       }
     } catch (error) {
       console.error(error);
@@ -152,6 +169,7 @@ function CreateBooking() {
       const bookingData = {
         salonId: Number(salonId),
         serviceIds: selectedServiceIds,
+        assignedEmployeeId: selectedEmployeeId ? Number(selectedEmployeeId) : null,
         customerPhoneNumber: customerPhoneNumber.trim(),
         customerLocation: customerLocation.trim(),
         bookingDate,
@@ -197,8 +215,8 @@ function CreateBooking() {
           <span className="eyebrow">Appointment request</span>
           <h1>Book {salon.name}</h1>
           <p>
-            Choose your services, date, and time. The salon owner will confirm
-            your request.
+            Choose your services, employee, date, and time. The salon owner will
+            confirm your request.
           </p>
         </div>
       </div>
@@ -249,6 +267,79 @@ function CreateBooking() {
                 })}
               </div>
             )}
+          </div>
+
+          <div className="booking-section-box">
+            <h2>
+              <UserRound size={22} />
+              Choose Employee
+            </h2>
+            <p>
+              Choose a specific employee, or keep it as any available employee.
+            </p>
+
+            <div className="employee-booking-select-grid">
+              <label
+                className={
+                  selectedEmployeeId === ""
+                    ? "employee-booking-option selected"
+                    : "employee-booking-option"
+                }
+              >
+                <input
+                  type="radio"
+                  name="selectedEmployee"
+                  value=""
+                  checked={selectedEmployeeId === ""}
+                  onChange={() => setSelectedEmployeeId("")}
+                />
+
+                <div className="employee-booking-avatar any-employee-avatar">
+                  <UserRound size={24} />
+                </div>
+
+                <div>
+                  <h3>Any available employee</h3>
+                  <p>The salon owner will assign the best available employee.</p>
+                </div>
+              </label>
+
+              {employees.map((employee) => (
+                <label
+                  className={
+                    Number(selectedEmployeeId) === Number(employee.id)
+                      ? "employee-booking-option selected"
+                      : "employee-booking-option"
+                  }
+                  key={employee.id}
+                >
+                  <input
+                    type="radio"
+                    name="selectedEmployee"
+                    value={employee.id}
+                    checked={Number(selectedEmployeeId) === Number(employee.id)}
+                    onChange={() => setSelectedEmployeeId(String(employee.id))}
+                  />
+
+                  <div className="employee-booking-avatar">
+                    {employee.imageUrl ? (
+                      <img src={employee.imageUrl} alt={employee.fullName} />
+                    ) : (
+                      employee.fullName?.charAt(0)?.toUpperCase() || "E"
+                    )}
+                  </div>
+
+                  <div>
+                    <h3>{employee.fullName}</h3>
+                    <p>{employee.specialty || "Salon Employee"}</p>
+                    <span>
+                      {employee.startTime?.toString().slice(0, 5)} -{" "}
+                      {employee.endTime?.toString().slice(0, 5)}
+                    </span>
+                  </div>
+                </label>
+              ))}
+            </div>
           </div>
 
           <div className="booking-section-box">
@@ -347,6 +438,20 @@ function CreateBooking() {
           <div className="booking-summary-total">
             <p>Selected services: {selectedServices.length}</p>
             <p>Total duration: {totalDuration} min</p>
+
+            {selectedEmployeeId ? (
+              <p>
+                Employee:{" "}
+                {
+                  employees.find(
+                    (employee) => Number(employee.id) === Number(selectedEmployeeId)
+                  )?.fullName
+                }
+              </p>
+            ) : (
+              <p>Employee: Any available employee</p>
+            )}
+
             <span>Total price</span>
             <strong>{totalPrice} JD</strong>
           </div>

@@ -36,3 +36,7 @@ export const getAllSalonsApi = async () => {
   const response = await axiosInstance.get("/salons");
   return response.data;
 };
+export const deleteMySalonApi = async () => {
+  const response = await axiosInstance.delete("/salons/deleteSalon");
+  return response.data;
+};

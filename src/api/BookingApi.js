@@ -45,3 +45,14 @@ export const completeBookingApi = async (bookingId) => {
   const response = await axiosInstance.put(`/bookings/${bookingId}/complete`);
   return response.data;
 };
+export const getMyEmployeeBookingsApi = async () => {
+  const response = await axiosInstance.get("/bookings/employee/my");
+  return response.data;
+};
+
+export const assignEmployeeToBookingApi = async (bookingId, employeeId) => {
+  const response = await axiosInstance.put(
+    `/bookings/${bookingId}/assign-employee/${employeeId}`,
+  );
+  return response.data;
+};

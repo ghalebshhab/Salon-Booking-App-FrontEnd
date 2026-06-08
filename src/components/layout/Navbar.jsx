@@ -137,6 +137,14 @@ function Navbar() {
                   <CalendarCheck size={17} />
                   Salon Bookings
                 </NavLink>
+                <NavLink
+  to="/employee/bookings"
+  className="dropdown-item"
+  onClick={closeMenus}
+>
+  <CalendarCheck size={17} />
+  My Employee Bookings
+</NavLink>
 
                 <NavLink
                   to="/owner/create-media-post"

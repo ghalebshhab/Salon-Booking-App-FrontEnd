@@ -24,6 +24,7 @@ import MyBookings from "../pages/public/MyBookings";
 import SalonBookings from "../pages/owner/SalonBookings";
 import MySalonEmployees from "../pages/owner/MySalonEmployees";
 
+import EmployeeBookings from "../pages/employee/EmployeeBookings";
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -54,7 +55,14 @@ function AppRoutes() {
     </ProtectedRoute>
   }
 />
-
+<Route
+  path="/employee/bookings"
+  element={
+    <ProtectedRoute>
+      <EmployeeBookings />
+    </ProtectedRoute>
+  }
+/>
 <Route
   path="/owner/bookings"
   element={

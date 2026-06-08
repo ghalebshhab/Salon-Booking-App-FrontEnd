@@ -1,17 +1,32 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  showSuccessToast,
-  showErrorToast,
-  showInfoToast,
-  showWarningToast,
+  CalendarCheck,
+  Clock,
+  Eye,
+  Image,
+  Mail,
+  MapPin,
+  Phone,
+  Plus,
+  Scissors,
+  Sparkles,
+  Users,
+  UsersRound,
+  BriefcaseBusiness,
+  Settings,
+} from "lucide-react";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { Trash2 } from "lucide-react";
+import { deleteMySalonApi } from "../../api/salonApi";
+import { showErrorToast } from "../../utils/appToast";
+import {
+  showSuccessToast
 } from "../../utils/appToast";
-import { Edit, Trash2, Users, Image, Scissors } from "lucide-react";
-
-import { getMySalonApi, getSalonEmployeesApi } from "../../api/salonApi";
+import { getMySalonApi } from "../../api/salonApi";
+import { getSalonEmployeesApi } from "../../api/SalonEmployeesApi";
 import { getSalonMediaApi } from "../../api/mediaApi";
 
-import SalonEmployees from "../../components/salons/SalonEmployees";
 import SalonMediaGrid from "../../components/media/SalonMediaGrid";
 import SalonStatusBadge from "../../components/salons/SalonStatusBadge";
 import Loading from "../../components/common/Loading";
@@ -23,14 +38,35 @@ function MySalon() {
   const [mediaPosts, setMediaPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
+  const [deleteSalonModalOpen, setDeleteSalonModalOpen] = useState(false);
+const [deletingSalon, setDeletingSalon] = useState(false);
   const formatTime = (time) => {
     if (!time) return "—";
     return time.toString().slice(0, 5);
   };
+  const handleDeleteSalon = async () => {
+  try {
+    setDeletingSalon(true);
+
+    const response = await deleteMySalonApi();
+
+    if (response.success) {
+      showSuccessToast("Salon deleted successfully.", "Deleted");
+      setDeleteSalonModalOpen(false);
+      navigate("/owner/dashboard");
+    } else {
+      showErrorToast(response.message || "Could not delete salon.", "Delete failed");
+    }
+  } catch (error) {
+    console.error(error);
+    showErrorToast("Could not delete salon.", "Delete failed");
+  } finally {
+    setDeletingSalon(false);
+  }
+};
 
   const getImages = (salonData) => {
-    // Backend DTO field is Images (capital I)
     return salonData?.Images || salonData?.images || [];
   };
 
@@ -49,31 +85,31 @@ function MySalon() {
       const salonData = response.data;
       setSalon(salonData);
 
-      // Load employees
       try {
         const empResponse = await getSalonEmployeesApi(salonData.salonId);
         if (empResponse.success) {
           setEmployees(empResponse.data || []);
         }
-      } catch {
-        // non-critical
+      } catch (err) {
+        console.warn("Employees could not be loaded", err);
       }
 
-      // Load media
       try {
         const mediaResponse = await getSalonMediaApi(salonData.salonId);
         if (mediaResponse.success) {
           setMediaPosts(mediaResponse.data || []);
         }
-      } catch {
-        // non-critical
+      } catch (err) {
+        console.warn("Media could not be loaded", err);
       }
     } catch (err) {
       const msg =
         err?.response?.status === 404
           ? "You haven't created a salon yet."
           : err?.response?.data?.message || "Failed to load your salon.";
+
       setError(msg);
+      showErrorToast(msg, "Loading failed");
     } finally {
       setLoading(false);
     }
@@ -90,12 +126,14 @@ function MySalon() {
   if (error || !salon) {
     return (
       <section className="container section">
-        <EmptyState
-          title="No salon found"
-          message={error || "You haven't created a salon yet. Create one to get started."}
-        />
-        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+        <div className="my-salon-empty-wrap">
+          <EmptyState
+            title="No salon found"
+            message={error || "You haven't created a salon yet. Create one to get started."}
+          />
+
           <Link className="btn btn-primary" to="/owner/create-salon">
+            <Plus size={18} />
             Create My Salon
           </Link>
         </div>
@@ -105,127 +143,298 @@ function MySalon() {
 
   const images = getImages(salon);
   const coverImage = images[0];
+  const galleryImages = images.slice(0, 4);
+
+  const currentEmployees = salon.currentNumOfEmployees ?? employees.length;
+  const maxEmployees = salon.maxNumOfEmployees ?? 0;
+  const availableSlots = Math.max(maxEmployees - currentEmployees, 0);
+
+  const activeEmployees = employees.filter((employee) => employee.status === "ACTIVE");
+  const invitedEmployees = employees.filter((employee) => employee.status === "INVITED");
 
   return (
-    <section className="container section">
-      {/* Cover */}
-      <div className="salon-cover">
-        {coverImage ? (
-          <img src={coverImage} alt={salon.name} />
-        ) : (
-          <div className="salon-cover-placeholder">
-            <span>{salon.name?.charAt(0)?.toUpperCase() || "S"}</span>
-          </div>
-        )}
-      </div>
+    <section className="my-salon-page">
+      <div className="container section">
+        <div className="my-salon-hero">
+          <div className="my-salon-cover">
+            {coverImage ? (
+              <img src={coverImage} alt={salon.name} />
+            ) : (
+              <div className="my-salon-cover-placeholder">
+                <Scissors size={44} />
+                <span>{salon.name?.charAt(0)?.toUpperCase() || "S"}</span>
+              </div>
+            )}
 
-      {/* Header */}
-      <div className="profile-header profile-header-overlap">
-        <div>
-          <span className="eyebrow">My salon</span>
-          <h1>{salon.name}</h1>
-          <p>{salon.city} • {salon.address}</p>
+            <div className="my-salon-cover-shade"></div>
+
+            <div className="my-salon-floating-status">
+              <SalonStatusBadge state={salon.state} />
+            </div>
+          </div>
+
+          <div className="my-salon-hero-content">
+            <div>
+              <span className="eyebrow">Salon control center</span>
+              <h1>{salon.name}</h1>
+
+              <p className="my-salon-location">
+                <MapPin size={17} />
+                {salon.city} • {salon.address}
+              </p>
+            </div>
+
+            <div className="my-salon-hero-actions">
+              <Link className="btn btn-primary" to={`/salons/${salon.salonId}`}>
+                <Eye size={18} />
+                Public View
+              </Link>
+
+              <Link className="btn btn-secondary" to="/owner/services">
+                <Scissors size={18} />
+                Manage Services
+              </Link>
+       <button
+  className="btn btn-danger"
+  type="button"
+  onClick={() => setDeleteSalonModalOpen(true)}
+>
+  <Trash2 size={18} />
+  Delete Salon
+</button>
+
+              <Link className="btn btn-secondary" to="/owner/bookings">
+                <CalendarCheck size={18} />
+                Bookings
+              </Link>
+            </div>
+
+            <div className="my-salon-mini-stats">
+              <div>
+                <Clock size={20} />
+                <strong>{formatTime(salon.openTime)} - {formatTime(salon.closeTime)}</strong>
+                <span>Working hours</span>
+              </div>
+
+              <div>
+                <UsersRound size={20} />
+                <strong>{currentEmployees}/{maxEmployees || "—"}</strong>
+                <span>Team capacity</span>
+              </div>
+
+              <div>
+                <Image size={20} />
+                <strong>{mediaPosts.length}</strong>
+                <span>Media posts</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <SalonStatusBadge state={salon.state} />
-          <Link
-            className="btn btn-secondary btn-small"
-            to={`/salons/${salon.salonId}`}
-          >
-            Public View
+        <div className="my-salon-actions-grid">
+          <Link className="my-salon-action-card primary-action" to="/owner/create-media-post">
+            <div>
+              <Image />
+            </div>
+            <h3>Post Media</h3>
+            <p>Share photos and videos from your salon work.</p>
+          </Link>
+
+          <Link className="my-salon-action-card" to="/owner/create-hiring-post">
+            <div>
+              <BriefcaseBusiness />
+            </div>
+            <h3>Create Hiring</h3>
+            <p>Publish a hiring post when you need team members.</p>
+          </Link>
+
+          <Link className="my-salon-action-card" to="/owner/employees">
+            <div>
+              <Users />
+            </div>
+            <h3>Employees</h3>
+            <p>Track invited and active employees in your salon.</p>
+          </Link>
+
+          <Link className="my-salon-action-card" to="/owner/create-service">
+            <div>
+              <Plus />
+            </div>
+            <h3>Add Service</h3>
+            <p>Create a new service customers can book.</p>
           </Link>
         </div>
-      </div>
 
-      {/* Quick actions */}
-      <div className="dashboard-grid" style={{ marginBottom: "2rem" }}>
-        <Link className="dashboard-card" to="/owner/create-hiring-post">
-          <Users size={24} />
-          <h3>Post Hiring</h3>
-          <p>Create a new hiring post for your salon.</p>
-        </Link>
+        <div className="my-salon-dashboard-layout">
+          <aside className="my-salon-sidebar">
+            <div className="my-salon-side-card">
+              <h3>Contact Details</h3>
 
-        <Link className="dashboard-card" to="/owner/create-media-post">
-          <Image size={24} />
-          <h3>Post Media</h3>
-          <p>Share images and videos of your work.</p>
-        </Link>
+              <p>
+                <Phone size={16} />
+                {salon.phoneNumber || "—"}
+              </p>
 
-        <Link className="dashboard-card" to="/owner/services">
-  <Scissors size={24} />
-  <h3>Manage Services</h3>
-  <p>Add, update, and disable services for your salon.</p>
-</Link>
-      </div>
+              <p>
+                <Mail size={16} />
+                {salon.email || "—"}
+              </p>
 
-      {/* Salon info grid */}
-      <div className="profile-info-grid">
-        <div className="info-card">
-          <h3>Contact</h3>
-          <p><strong>Phone:</strong> {salon.phoneNumber || "—"}</p>
-          <p><strong>Email:</strong> {salon.email || "—"}</p>
-          <p><strong>Address:</strong> {salon.address || "—"}</p>
-          <p><strong>City:</strong> {salon.city || "—"}</p>
+              <p>
+                <MapPin size={16} />
+                {salon.address || "—"}
+              </p>
+            </div>
+
+            <div className="my-salon-side-card">
+              <h3>Owner Info</h3>
+
+              <div className="my-salon-owner-mini">
+                <div className="my-salon-owner-avatar">
+                  {salon.ownerName?.charAt(0)?.toUpperCase() || "O"}
+                </div>
+
+                <div>
+                  <strong>{salon.ownerName || "Owner"}</strong>
+                  <span>{salon.ownerEmail || "No email"}</span>
+                </div>
+              </div>
+
+              <p>
+                <Phone size={16} />
+                {salon.ownerPhoneNumber || "—"}
+              </p>
+            </div>
+
+            <div className="my-salon-side-card capacity-card">
+              <h3>Team Capacity</h3>
+
+              <div className="capacity-number">
+                {currentEmployees}
+                <span>/ {maxEmployees || "—"}</span>
+              </div>
+
+              <p>
+                <Sparkles size={16} />
+                {availableSlots} available employee slots
+              </p>
+            </div>
+          </aside>
+
+          <main className="my-salon-main-content">
+            <section className="my-salon-panel">
+              <div className="my-salon-panel-header">
+                <div>
+                  <span className="eyebrow">Team status</span>
+                  <h2>Employees overview</h2>
+                  <p>See active and invited employees in your salon.</p>
+                </div>
+
+                <Link className="btn btn-secondary btn-small" to="/owner/employees">
+                  Manage Team
+                </Link>
+              </div>
+
+              <div className="my-salon-team-summary">
+                <div className="team-summary-card active-team">
+                  <strong>{activeEmployees.length}</strong>
+                  <span>Active employees</span>
+                </div>
+
+                <div className="team-summary-card invited-team">
+                  <strong>{invitedEmployees.length}</strong>
+                  <span>Invited employees</span>
+                </div>
+
+                <div className="team-summary-card empty-team">
+                  <strong>{availableSlots}</strong>
+                  <span>Available slots</span>
+                </div>
+              </div>
+
+              {employees.length === 0 ? (
+                <div className="empty-state">
+                  <h3>No employees yet</h3>
+                  <p>Add employees from the Employees page or while creating a salon.</p>
+                </div>
+              ) : (
+                <div className="my-salon-employee-strip">
+                  {employees.slice(0, 6).map((employee) => (
+                    <div className="my-salon-employee-chip" key={employee.id}>
+                      <div className="employee-chip-avatar">
+                        {employee.imageUrl ? (
+                          <img src={employee.imageUrl} alt={employee.fullName} />
+                        ) : (
+                          employee.fullName?.charAt(0)?.toUpperCase() || "E"
+                        )}
+                      </div>
+
+                      <div>
+                        <strong>{employee.fullName}</strong>
+                        <span>{employee.specialty || employee.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="my-salon-panel">
+              <div className="my-salon-panel-header">
+                <div>
+                  <span className="eyebrow">Salon visuals</span>
+                  <h2>Gallery preview</h2>
+                  <p>Images you uploaded for the salon profile.</p>
+                </div>
+              </div>
+
+              {galleryImages.length === 0 ? (
+                <div className="empty-state">
+                  <h3>No profile images</h3>
+                  <p>Add image URLs in your salon data to make the profile stand out.</p>
+                </div>
+              ) : (
+                <div className="my-salon-gallery-preview">
+                  {galleryImages.map((imageUrl, index) => (
+                    <img
+                      key={imageUrl + index}
+                      src={imageUrl}
+                      alt={`Salon image ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="my-salon-panel">
+              <div className="my-salon-panel-header">
+                <div>
+                  <span className="eyebrow">Recent work</span>
+                  <h2>Media posts</h2>
+                  <p>Photos and videos shared from your salon.</p>
+                </div>
+
+                <Link className="btn btn-secondary btn-small" to="/owner/create-media-post">
+                  Add Media
+                </Link>
+              </div>
+
+              <SalonMediaGrid mediaPosts={mediaPosts} />
+            </section>
+          </main>
         </div>
-
-        <div className="info-card">
-          <h3>Working Hours</h3>
-          <p><strong>Open:</strong> {formatTime(salon.openTime)}</p>
-          <p><strong>Close:</strong> {formatTime(salon.closeTime)}</p>
-          <p><strong>Status:</strong> {salon.state}</p>
-        </div>
-
-        <div className="info-card">
-          <h3>Employees Capacity</h3>
-          <p><strong>Current:</strong> {salon.currentNumOfEmployees ?? employees.length}</p>
-          <p><strong>Max:</strong> {salon.maxNumOfEmployees ?? "—"}</p>
-          <p>
-            <strong>Available slots:</strong>{" "}
-            {(salon.maxNumOfEmployees ?? 0) - (salon.currentNumOfEmployees ?? employees.length)}
-          </p>
-        </div>
-
-        <div className="info-card">
-          <h3>Owner Info</h3>
-          <p><strong>Name:</strong> {salon.ownerName || "—"}</p>
-          <p><strong>Email:</strong> {salon.ownerEmail || "—"}</p>
-          <p><strong>Phone:</strong> {salon.ownerPhoneNumber || "—"}</p>
-        </div>
       </div>
-
-      {/* Gallery */}
-      {images.length > 0 && (
-        <>
-          <div className="section-title left">
-            <h2>Salon Images</h2>
-            <p>Photos you uploaded for your salon profile.</p>
-          </div>
-          <div className="simple-gallery">
-            {images.map((imageUrl, index) => (
-              <img
-                key={imageUrl + index}
-                src={imageUrl}
-                alt={`Salon image ${index + 1}`}
-              />
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Employees */}
-      <div className="section-title left">
-        <h2>Employees</h2>
-        <p>Active employees currently in your salon.</p>
-      </div>
-      <SalonEmployees employees={employees} />
-
-      {/* Media posts */}
-      <div className="section-title left">
-        <h2>Media Posts</h2>
-        <p>Images and videos you've shared from your salon.</p>
-      </div>
-      <SalonMediaGrid mediaPosts={mediaPosts} />
+      <ConfirmDialog
+  open={deleteSalonModalOpen}
+  title="Delete your salon?"
+  message="Your salon will be hidden from customers. Your data will stay in the database because this is a soft delete."
+  confirmText="Yes, delete salon"
+  cancelText="No, keep it"
+  danger={true}
+  loading={deletingSalon}
+  onCancel={() => setDeleteSalonModalOpen(false)}
+  onConfirm={handleDeleteSalon}
+/>
     </section>
   );
 }

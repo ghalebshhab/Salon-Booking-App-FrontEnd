@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import {
   showSuccessToast,
   showErrorToast,
-  showInfoToast,
-  showWarningToast,
 } from "../../utils/appToast";
 import {
   CalendarDays,
@@ -13,17 +11,22 @@ import {
   Phone,
   XCircle,
   MessageSquareText,
+  UserRound,
 } from "lucide-react";
 
 import {
   acceptBookingApi,
+  assignEmployeeToBookingApi,
   completeBookingApi,
   getMySalonBookingsApi,
   rejectBookingApi,
 } from "../../api/bookingApi";
 
+import { getMySalonEmployeesApi } from "../../api/SalonEmployeesApi";
+
 function SalonBookings() {
   const [bookings, setBookings] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -43,6 +46,20 @@ function SalonBookings() {
       } else {
         showErrorToast(response.message || "Failed to load salon bookings");
       }
+
+      try {
+        const employeesResponse = await getMySalonEmployeesApi();
+
+        if (employeesResponse.success) {
+          const activeEmployees = (employeesResponse.data || []).filter(
+            (employee) => employee.status === "ACTIVE"
+          );
+
+          setEmployees(activeEmployees);
+        }
+      } catch (error) {
+        console.warn("Employees could not be loaded", error);
+      }
     } catch (error) {
       console.error(error);
       showErrorToast("Failed to load salon bookings");
@@ -55,11 +72,30 @@ function SalonBookings() {
     loadBookings();
   }, []);
 
-  const handleAccept = async (bookingId) => {
+  const handleAssignEmployee = async (bookingId, employeeId) => {
+    if (!employeeId) return;
+
     try {
-      const response = await acceptBookingApi(bookingId, {
+      const response = await assignEmployeeToBookingApi(bookingId, employeeId);
+
+      if (response.success) {
+        showSuccessToast("Employee assigned successfully.", "Assigned");
+        loadBookings();
+      } else {
+        showErrorToast(response.message || "Could not assign employee.", "Failed");
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorToast("Could not assign employee.", "Failed");
+    }
+  };
+
+  const handleAccept = async (booking) => {
+    try {
+      const response = await acceptBookingApi(booking.id, {
         ownerNote: "Accepted, please come on time.",
         ownerSuggestedTime: null,
+        assignedEmployeeId: booking.assignedEmployeeId || null,
       });
 
       if (response.success) {
@@ -161,7 +197,9 @@ function SalonBookings() {
         <div>
           <span className="eyebrow">Salon appointments</span>
           <h1>Salon Bookings</h1>
-          <p>Accept, reject, or complete customer booking requests.</p>
+          <p>
+            Accept, reject, assign employee, or complete customer booking requests.
+          </p>
         </div>
       </div>
 
@@ -176,9 +214,7 @@ function SalonBookings() {
             <div className="booking-card" key={booking.id}>
               <div className="booking-card-header">
                 <div>
-                  <h3>
-                    {booking.customerName || "Customer"}
-                  </h3>
+                  <h3>{booking.customerName || "Customer"}</h3>
                   <p>{booking.customerEmail}</p>
                 </div>
 
@@ -220,6 +256,36 @@ function SalonBookings() {
                 </div>
               </div>
 
+              <div className="booking-assigned-employee-box">
+                <div>
+                  <strong>
+                    <UserRound size={15} />
+                    Assigned employee
+                  </strong>
+                  <p>
+                    {booking.assignedEmployeeName
+                      ? `${booking.assignedEmployeeName} • ${
+                          booking.assignedEmployeeSpecialty || "Employee"
+                        }`
+                      : "No employee assigned yet"}
+                  </p>
+                </div>
+
+                {(booking.status === "PENDING" || booking.status === "ACCEPTED") && (
+                  <select
+                    value={booking.assignedEmployeeId || ""}
+                    onChange={(e) => handleAssignEmployee(booking.id, e.target.value)}
+                  >
+                    <option value="">Assign employee</option>
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {employee.fullName} - {employee.specialty || "Employee"}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
               <div className="booking-summary-row">
                 <span>Total Price: {booking.totalPrice} JD</span>
                 <span>Total Duration: {booking.totalDurationMinutes} min</span>
@@ -248,7 +314,7 @@ function SalonBookings() {
                 <div className="service-actions">
                   <button
                     className="btn btn-primary btn-small"
-                    onClick={() => handleAccept(booking.id)}
+                    onClick={() => handleAccept(booking)}
                   >
                     <CheckCircle size={16} />
                     Accept
